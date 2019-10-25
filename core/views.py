@@ -11,17 +11,24 @@ class TaskListFormView(FormView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data()
-        context['Task'] = Task.objects.all().prefetch_related('id', 'name', 'status').order_by('status')
+        context['tasks'] = Task.objects.all().order_by('status')
         return context
 
 
 class TaskDetailFormView(FormView):
-    template_name = 'core/tusk_page.html'
+    template_name = 'core/task_page.html'
+    form_class = TaskForm
 
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            Task.objects.get(id=kwargs['pk'])
-        except ObjectDoesNotExist:
-            return reverse('task_list_form_view')
-        finally:
-            return super().dispatch(self, request, *args, **kwargs)
+    # def dispatch(self, request, *args, **kwargs):
+    #     try:
+    #         Task.objects.get(id=request.GET.get('pk'))
+    #     except ObjectDoesNotExist:
+    #         return reverse('task_list_form_view')
+    #     finally:
+    #         return super().dispatch(self, request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['task'] = Task.objects.get(id=self.kwargs['pk'])
+        context['rezult'] = 'your query'
+        return context
